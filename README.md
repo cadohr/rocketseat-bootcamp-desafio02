@@ -6,20 +6,20 @@
 
 ## About
 
-An application to store recipients
+An application for carriers
 
 ## Installation
 
 Clone the project with
 
 ```sh
-git clone https://github.com/cadohr/rocketseat-bootcamp-desafio02.git
+git clone https://github.com/cadohr/rocketseat-bootcamp-fastfeet.git
 ```
 
 Get in the project path
 
 ```sh
-cd rocketseat-bootcamp-desafio02
+cd rocketseat-bootcamp-fastfeet
 ```
 
 Then install the dependencies with:
