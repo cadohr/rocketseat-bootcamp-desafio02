@@ -75,7 +75,7 @@ class DeliverymanController {
     return res.json({ id, name, email });
   }
 
-  async delete(req, res) {
+  async destroy(req, res) {
     const deliveryman = await Deliveryman.findByPk(req.params.id);
 
     if (!deliveryman) {

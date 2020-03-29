@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { darken } from 'polished';
 
+import colors from '~/styles/colors';
+
 export const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
@@ -50,13 +52,13 @@ export const Container = styled.div`
   } */
 `;
 
-export const DeliveryTable = styled.table`
+export const Table = styled.table`
   width: 100%;
   border: none;
   border-spacing: 0 15px;
 
   thead th {
-    color: #444;
+    color: ${colors.gray27};
     text-align: left;
     font-size: 16px;
     padding: 12px;
@@ -68,7 +70,8 @@ export const DeliveryTable = styled.table`
   }
 
   tbody td {
-    background: #fff;
+    color: ${colors.gray40};
+    background: ${colors.white};
     padding: 12px;
     font-size: 16px;
     vertical-align: middle;
@@ -80,18 +83,22 @@ export const DeliveryTable = styled.table`
     div {
       display: flex;
       align-items: center;
+
+      .sb-avatar {
+        border-radius: 50%;
+        overflow: hidden;
+        font-size: 36px;
+      }
+
+      > span {
+        margin-left: 10px;
+      }
     }
 
     img {
       width: 35px;
       height: 35px;
       border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    button {
-      background: none;
-      border: 0;
     }
   }
 `;
@@ -112,28 +119,3 @@ export const Status = styled.div`
     margin: 0 5px;
   }
 `;
-
-export const ActionList = styled.div`
-  position: absolute;
-  width: 200px;
-  left: calc(50% - 100px);
-  top: calc(100% + 15px);
-
-  padding: 15px;
-
-  background: #eee;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: calc(50% - 10px);
-    top: -10px;
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid rgba(0, 0, 0, 0.6);
-  }
-`;
-
-export const Action = styled.button``;

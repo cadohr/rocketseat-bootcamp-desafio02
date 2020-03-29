@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-  MdMoreHoriz,
-  MdAdd,
-  MdRemoveRedEye,
-  MdModeEdit,
-  MdDeleteForever,
-} from 'react-icons/md';
-
+import { MdMoreHoriz, MdAdd } from 'react-icons/md';
 import { Form, Input } from '@rocketseat/unform';
+import Avatar, { ConfigProvider } from 'react-avatar';
+
+import TableActions from '~/components/TableActions';
 
 import api from '~/services/api';
 
-import { Container, DeliveryTable, Status, ActionList, Action } from './styles';
+import { Container, Table, Status } from './styles';
 
 export default function Delivery() {
   const [deliveries, setDeliveries] = useState([]);
@@ -19,6 +15,7 @@ export default function Delivery() {
   useEffect(() => {
     async function loadDeliveries() {
       const response = await api.get('deliveries');
+      console.log(response);
 
       setDeliveries(response.data);
     }
@@ -29,7 +26,7 @@ export default function Delivery() {
     <Container>
       <h1>Gerenciando encomendas</h1>
 
-      <div>
+      {/* <div>
         <Form>
           <Input name="search" placeholder="Buscar por encomendas" />
         </Form>
@@ -37,13 +34,9 @@ export default function Delivery() {
           <MdAdd size={26} color="#fff" />
           CADASTRAR
         </button>
-      </div>
+      </div> */}
 
-      {/* {deliveries.map(delivery => (
-          <Delivery key={String(delivery.id)}></Delivery>
-        ))} */}
-
-      <DeliveryTable>
+      <Table>
         <thead>
           <tr>
             <th>ID</th>
@@ -62,14 +55,30 @@ export default function Delivery() {
               <td>{delivery.recipient.name}</td>
               <td>
                 <div>
-                  <img
-                    src={
-                      delivery.deliveryman.avatar.url ||
-                      'https://api.adorable.io/avatars/50/abott@adorable.png'
-                    }
-                    alt="Ricardo Jacinto"
-                  />
-                  {delivery.deliveryman.name}
+                  {delivery.deliveryman.avatar.url ? (
+                    <img
+                      src={delivery.deliveryman.avatar.url}
+                      alt={delivery.deliveryman.name}
+                    />
+                  ) : (
+                    <ConfigProvider
+                      colors={[
+                        '#F4EFFC',
+                        '#FCF4EE',
+                        '#EBFBFA',
+                        '#FFEEF1',
+                        '#F4F9EF',
+                      ]}
+                    >
+                      <Avatar
+                        size="35"
+                        name={delivery.deliveryman.name}
+                        alt={delivery.deliveryman.name}
+                      />
+                    </ConfigProvider>
+                  )}
+
+                  <span>{delivery.deliveryman.name}</span>
                 </div>
               </td>
               <td>{delivery.recipient.city}</td>
@@ -89,11 +98,24 @@ export default function Delivery() {
             <td>Ludiwig van Beethoven</td>
             <td>
               <div>
-                <img
-                  src="https://api.adorable.io/avatars/50/abott@adorable.png"
-                  alt="Ricardo Jacinto"
-                />
-                John doe
+                <ConfigProvider
+                  colors={[
+                    '#f4effc',
+                    '#fcf4ee',
+                    '#ebfbfa',
+                    '#ffeef1',
+                    '#f4f9ef',
+                  ]}
+                >
+                  <Avatar
+                    fgColor="#777"
+                    size="35"
+                    name="John Doe"
+                    alt="John Doe"
+                  />
+                </ConfigProvider>
+
+                <span>John Doe</span>
               </div>
             </td>
             <td>Rio do sul</td>
@@ -102,9 +124,7 @@ export default function Delivery() {
               <Status color="#DFF0DF">ENTREGUE</Status>
             </td>
             <td>
-              <button type="button">
-                <MdMoreHoriz size={16} color="#c6c6c6" />
-              </button>
+              <TableActions />
             </td>
           </tr>
 
@@ -113,11 +133,24 @@ export default function Delivery() {
             <td>Ludiwig van Beethoven</td>
             <td>
               <div>
-                <img
-                  src="https://api.adorable.io/avatars/50/abott@adorable.png"
-                  alt="Ricardo Jacinto"
-                />
-                John doe
+                <ConfigProvider
+                  colors={[
+                    '#f4effc',
+                    '#fcf4ee',
+                    '#ebfbfa',
+                    '#ffeef1',
+                    '#f4f9ef',
+                  ]}
+                >
+                  <Avatar
+                    fgColor="#777"
+                    size="35"
+                    name="John Doe"
+                    alt="John Doe"
+                  />
+                </ConfigProvider>
+
+                <span>John Doe</span>
               </div>
             </td>
             <td>Rio do sul</td>
@@ -126,9 +159,7 @@ export default function Delivery() {
               <Status color="#BAD2FF">RETIRADA</Status>
             </td>
             <td>
-              <button type="button">
-                <MdMoreHoriz size={16} color="#c6c6c6" />
-              </button>
+              <TableActions />
             </td>
           </tr>
 
@@ -137,11 +168,24 @@ export default function Delivery() {
             <td>Ludiwig van Beethoven</td>
             <td>
               <div>
-                <img
-                  src="https://api.adorable.io/avatars/50/abott@adorable.png"
-                  alt="Ricardo Jacinto"
-                />
-                John doe
+                <ConfigProvider
+                  colors={[
+                    '#fcf4ee',
+                    '#ebfbfa',
+                    '#f4effc',
+                    '#ffeef1',
+                    '#f4f9ef',
+                  ]}
+                >
+                  <Avatar
+                    fgColor="#777"
+                    size="35"
+                    name="John Doe"
+                    alt="John Doe"
+                  />
+                </ConfigProvider>
+
+                <span>John Doe</span>
               </div>
             </td>
             <td>Rio do sul</td>
@@ -150,9 +194,7 @@ export default function Delivery() {
               <Status color="#FAB0B0">CANCELADA</Status>
             </td>
             <td>
-              <button type="button">
-                <MdMoreHoriz size={16} color="#c6c6c6" />
-              </button>
+              <TableActions />
             </td>
           </tr>
 
@@ -161,11 +203,24 @@ export default function Delivery() {
             <td>Ludiwig van Beethoven</td>
             <td>
               <div>
-                <img
-                  src="https://api.adorable.io/avatars/50/abott@adorable.png"
-                  alt="Ricardo Jacinto"
-                />
-                John doe
+                <ConfigProvider
+                  colors={[
+                    '#f4effc',
+                    '#ebfbfa',
+                    '#fcf4ee',
+                    '#ffeef1',
+                    '#f4f9ef',
+                  ]}
+                >
+                  <Avatar
+                    fgColor="#777"
+                    size="35"
+                    name="John Doe"
+                    alt="John Doe"
+                  />
+                </ConfigProvider>
+
+                <span>John Doe</span>
               </div>
             </td>
             <td>Rio do sul</td>
@@ -174,26 +229,11 @@ export default function Delivery() {
               <Status color="#F0F0DF">PENDENTE</Status>
             </td>
             <td>
-              <button type="button">
-                <MdMoreHoriz size={16} color="#c6c6c6" />
-              </button>
-              <ActionList>
-                <Action>
-                  <MdRemoveRedEye /> Visualizar
-                </Action>
-                <Action>
-                  <MdModeEdit />
-                  Editar
-                </Action>
-                <Action>
-                  <MdDeleteForever />
-                  Excluir
-                </Action>
-              </ActionList>
+              <TableActions />
             </td>
           </tr>
         </tbody>
-      </DeliveryTable>
+      </Table>
     </Container>
   );
 }

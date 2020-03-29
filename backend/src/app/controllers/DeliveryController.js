@@ -174,7 +174,7 @@ class DeliveryController {
     return res.json(delivery);
   }
 
-  async delete(req, res) {
+  async destroy(req, res) {
     const delivery = await Delivery.findByPk(req.params.id);
 
     if (!delivery) {
