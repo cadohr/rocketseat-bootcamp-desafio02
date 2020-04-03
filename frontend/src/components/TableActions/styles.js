@@ -29,13 +29,18 @@ export const ActionList = styled.div`
   &::before {
     content: '';
     position: absolute;
-    left: calc(50% - 3px);
-    top: -4px;
+    left: calc(55%);
+    top: -0px;
     width: 0;
     height: 0;
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    border-bottom: 4px solid red;
+    border-style: solid;
+    border-width: 5px 5px;
+    border-color: transparent transparent white white;
+
+    transform-origin: 0 0;
+    transform: rotate(135deg);
+
+    box-shadow: -2px 2px 2px 0px rgba(0, 0, 0, 0.1);
   }
 `;
 

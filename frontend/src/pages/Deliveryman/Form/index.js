@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
-import { Form } from '@unform/core';
 
+import { Form } from '@unform/core';
+import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
+
+import api from '~/services/api';
 import Input from '~/components/Form/SimpleInput';
 
 import { Container, Header, Content, InputGroup } from './styles';
-import api from '~/services/api';
 
-export default function RecipientForm({ match }) {
+export default function DeliveryForm({ match }) {
   const { id } = match.params;
-  const formRef = useRef;
-  const [recipient, setRecipient] = useState({});
+  const formRef = useRef();
 
   useEffect(() => {
-    async function loadRecipient() {
-      const response = await api.get(`recipients/${id}`);
+    async function loadDelivery() {
+      const response = await api.get(`deliveries/${id}`);
 
       formRef.current.setData(response.data);
     }
 
-    loadRecipient();
+    loadDelivery();
   }, [id]);
 
   function handleSubmit() {
@@ -32,10 +32,10 @@ export default function RecipientForm({ match }) {
     <Container>
       <Form ref={formRef} onSubmit={handleSubmit}>
         <Header>
-          <h1>{id ? 'Edição de destinatário' : 'Cadastro de destinatário'}</h1>
+          <h1>{id ? 'Edição de encomenda' : 'Cadastro de encomenda'}</h1>
 
           <div>
-            <Link to="/destinatarios">
+            <Link to="/encomendas">
               <MdKeyboardArrowLeft size={22} />
               <span>VOLTAR</span>
             </Link>
@@ -47,31 +47,18 @@ export default function RecipientForm({ match }) {
         </Header>
 
         <Content>
-          <InputGroup>
-            <Input name="name" label="Nome" />
-          </InputGroup>
-
           <div>
-            <InputGroup style={{ flex: 2 }}>
+            <InputGroup>
               <Input name="street" label="Rua" />
             </InputGroup>
             <InputGroup>
               <Input name="number" label="Número" />
             </InputGroup>
-            <InputGroup>
-              <Input name="complement" label="Complemento" />
-            </InputGroup>
           </div>
 
           <div>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="city" label="Cidade" />
-            </InputGroup>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="state" label="Estado" />
-            </InputGroup>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="postcode" label="CEP" />
+            <InputGroup>
+              <Input name="product" label="Nome do produto" />
             </InputGroup>
           </div>
         </Content>

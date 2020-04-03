@@ -1,7 +1,7 @@
 import React from 'react';
 
-// import { Container } from './styles';
+import { Wrapper } from './styles';
 
-export default function Table() {
-  return <div />;
+export default function Table({ children }) {
+  return <Wrapper>{children}</Wrapper>;
 }

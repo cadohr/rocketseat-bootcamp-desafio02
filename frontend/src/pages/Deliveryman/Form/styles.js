@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { darken } from 'polished';
 
 import colors from '~/styles/colors';
+import { darken } from 'polished';
 
 export const Container = styled.div`
   max-width: 960px;

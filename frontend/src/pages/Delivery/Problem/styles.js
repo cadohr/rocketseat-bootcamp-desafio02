@@ -5,6 +5,10 @@ export const Container = styled.div`
   margin: 0 auto;
   padding: 25px 0;
 
+  h1 {
+    font-size: 24px;
+  }
+
   > span {
     display: block;
     margin-top: 25px;
