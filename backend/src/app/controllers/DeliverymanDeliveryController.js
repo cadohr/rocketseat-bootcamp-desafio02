@@ -11,7 +11,7 @@ import Recipient from '../models/Recipient';
 class DeliverymanDeliveryController {
   async index(req, res) {
     const { id } = req.params;
-    const { delivered = true, page = 1 } = req.query;
+    const { delivered = true, page = 1, limit = 20 } = req.query;
 
     const deliveryman = await Deliveryman.findByPk(id);
 
@@ -36,8 +36,6 @@ class DeliverymanDeliveryController {
         deliveryman_id: id,
         ...subquery,
       },
-      limit: 10,
-      offset: (page - 1) * 20,
       attributes: ['id', 'product', 'canceled_at', 'start_date', 'end_date'],
       include: [
         {
@@ -72,6 +70,8 @@ class DeliverymanDeliveryController {
           ],
         },
       ],
+      limit,
+      offset: (page - 1) * limit,
     });
 
     return res.json(deliveries);

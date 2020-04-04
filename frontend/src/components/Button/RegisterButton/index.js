@@ -3,15 +3,15 @@ import { MdAdd } from 'react-icons/md';
 
 import colors from '~/styles/colors';
 
-import IconButton from '../IconButton';
+import IconLinkButton from '../IconLinkButton';
 
-export default function RegiterButton({ action }) {
+export default function RegisterButton({ to }) {
   return (
-    <IconButton
+    <IconLinkButton
       title="CADASTRAR"
       Icon={MdAdd}
-      action={action}
-      background={colors.darkPurple}
+      to={to}
+      background={colors.primary}
     />
   );
 }

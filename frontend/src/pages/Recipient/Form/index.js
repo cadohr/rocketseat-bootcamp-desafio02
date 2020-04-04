@@ -1,81 +1,128 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
-import { Form } from '@unform/core';
+import React, { useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
+import { Form } from '@unform/web';
+import * as Yup from 'yup';
 
-import Input from '~/components/Form/SimpleInput';
-
-import { Container, Header, Content, InputGroup } from './styles';
 import api from '~/services/api';
+import history from '~/services/history';
+
+import { Input } from '~/components/Form';
+import HeaderForm from '~/components/HeaderForm';
+import { BackButton, SaveButton } from '~/components/Button';
+
+import { Container, Content, InputGroup } from './styles';
 
 export default function RecipientForm({ match }) {
   const { id } = match.params;
-  const formRef = useRef;
-  const [recipient, setRecipient] = useState({});
+  const formRef = useRef();
+
+  const title = id ? 'Edição de destinatário' : 'Cadastro de destinatário';
 
   useEffect(() => {
     async function loadRecipient() {
-      const response = await api.get(`recipients/${id}`);
+      if (id) {
+        const response = await api.get(`recipients/${id}`);
+        console.tron.log(response);
 
-      formRef.current.setData(response.data);
+        formRef.current.setData(response.data);
+      }
     }
 
     loadRecipient();
   }, [id]);
 
-  function handleSubmit() {
-    console.log(123123);
-    // dispatch()
+  async function handleSubmit(data, { reset }) {
+    formRef.current.setErrors({});
+
+    try {
+      const schema = Yup.object().shape({
+        name: Yup.string().required('O nome é obrigatório'),
+        street: Yup.string().required('A rua é obrigatório'),
+        number: Yup.string().required('O número é obrigatório'),
+        complement: Yup.string(),
+        city: Yup.string().required('A cidade é obrigatório'),
+        state: Yup.string().required('O estado é obrigatório'),
+        postcode: Yup.string().required('O CEP é obrigatório'),
+      });
+
+      await schema.validate(data, { abortEarly: false });
+
+      if (!id) {
+        await api.post('/recipients', {
+          name: data.name,
+          street: data.street,
+          number: data.number,
+          complement: data.complement,
+          city: data.city,
+          state: data.state,
+          postcode: data.postcode,
+        });
+
+        toast.success('Destinatário cadastrado com sucesso!');
+      } else {
+        await api.put(`/recipients/${id}`, {
+          name: data.name,
+          street: data.street,
+          number: data.number,
+          complement: data.complement,
+          city: data.city,
+          state: data.state,
+          postcode: data.postcode,
+        });
+
+        toast.success('Destinatário editado com sucesso!');
+      }
+
+      reset();
+      return history.push('/destinatarios');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errorMessages = {};
+
+        err.inner.forEach(error => {
+          errorMessages[error.path] = error.message;
+        });
+
+        formRef.current.setErrors(errorMessages);
+      }
+    }
   }
 
   return (
     <Container>
-      <Form ref={formRef} onSubmit={handleSubmit}>
-        <Header>
-          <h1>{id ? 'Edição de destinatário' : 'Cadastro de destinatário'}</h1>
+      <HeaderForm title={title}>
+        <BackButton to="/destinatarios" />
+        <SaveButton action={() => formRef.current.submitForm()} />
+      </HeaderForm>
+      <Content>
+        <Form ref={formRef} onSubmit={handleSubmit}>
+          <Input type="text" label="Nome" name="name" />
 
-          <div>
-            <Link to="/destinatarios">
-              <MdKeyboardArrowLeft size={22} />
-              <span>VOLTAR</span>
-            </Link>
-            <button type="submit">
-              <MdDone size={22} />
-              <span>SALVAR</span>
-            </button>
-          </div>
-        </Header>
-
-        <Content>
-          <InputGroup>
-            <Input name="name" label="Nome" />
-          </InputGroup>
-
-          <div>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="street" label="Rua" />
+          <section>
+            <InputGroup style={{ flex: 3 }}>
+              <Input type="text" name="street" label="Rua" />
             </InputGroup>
             <InputGroup>
-              <Input name="number" label="Número" />
+              <Input type="text" name="number" label="Número" />
             </InputGroup>
             <InputGroup>
-              <Input name="complement" label="Complemento" />
+              <Input type="text" name="complement" label="Complemento" />
             </InputGroup>
-          </div>
+          </section>
 
-          <div>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="city" label="Cidade" />
+          <section>
+            <InputGroup>
+              <Input type="text" name="city" label="Cidade" />
             </InputGroup>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="state" label="Estado" />
+            <InputGroup>
+              <Input type="text" name="state" label="Estado" />
             </InputGroup>
-            <InputGroup style={{ flex: 2 }}>
-              <Input name="postcode" label="CEP" />
+            <InputGroup>
+              <Input type="text" name="postcode" label="CEP" />
             </InputGroup>
-          </div>
-        </Content>
-      </Form>
+          </section>
+        </Form>
+      </Content>
     </Container>
   );
 }

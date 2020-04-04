@@ -11,7 +11,7 @@ export const Container = styled.div`
 export const Label = styled.label`
   font-size: 14px;
   font-weight: bold;
-  color: ${colors.gray27};
+  color: ${colors.darkGray};
 
   margin-bottom: 10px;
 `;
@@ -19,7 +19,7 @@ export const Label = styled.label`
 export const Error = styled.span`
   font-size: 11px;
   font-weight: bold;
-  color: ${colors.indianRed};
+  color: ${colors.darkRed};
 
   margin-top: 8px;
 `;

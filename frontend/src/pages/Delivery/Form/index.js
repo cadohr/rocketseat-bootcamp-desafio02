@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
+import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { Form } from '@unform/web';
-
 import api from '~/services/api';
+import history from '~/services/history';
 
-import BackButton from '~/components/Button/BackButton';
-import SaveButton from '~/components/Button/SaveButton';
 import HeaderForm from '~/components/HeaderForm';
-import Select from '~/components/Form/AsyncSelect';
-import Input from '~/components/Form/SimpleInput';
+import { Input, Select } from '~/components/Form';
+import { BackButton, SaveButton } from '~/components/Button';
 
 import { Container, Content } from './styles';
 
-export default function DeliveryForm({ match, navigation }) {
+export default function DeliveryForm({ match }) {
   const { id } = match.params;
   const formRef = useRef();
 
@@ -26,14 +24,50 @@ export default function DeliveryForm({ match, navigation }) {
         const response = await api.get(`deliveries/${id}`);
 
         formRef.current.setData(response.data);
+        formRef.current.setFieldValue('recipient_id', {
+          value: response.data.recipient.id,
+          label: response.data.recipient.name,
+        });
+
+        formRef.current.setFieldValue('deliveryman_id', {
+          value: response.data.deliveryman.id,
+          label: response.data.deliveryman.name,
+        });
       }
     }
 
     loadDelivery();
   }, [id]);
 
-  async function loadRecipientsOptions() {}
-  async function loadDeliverymenOptions() {}
+  const customStylesSelectInput = {
+    control: provided => ({
+      ...provided,
+      height: 45,
+    }),
+  };
+
+  async function loadOptions(path, inputValue, callback) {
+    const response = await api.get(`/${path}`, {
+      params: {
+        q: inputValue,
+      },
+    });
+
+    const data = response.data.map(item => ({
+      value: item.id,
+      label: item.name,
+    }));
+
+    callback(data);
+  }
+
+  function loadRecipientsOptions(inputValue, callback) {
+    loadOptions('recipients', inputValue, callback);
+  }
+
+  async function loadDeliverymenOptions(inputValue, callback) {
+    loadOptions('deliverymen', inputValue, callback);
+  }
 
   async function handleSubmit(data, { reset }) {
     formRef.current.setErrors({});
@@ -55,21 +89,18 @@ export default function DeliveryForm({ match, navigation }) {
         });
 
         toast.success('Encomenda cadastrada com sucesso!');
+      } else {
+        await api.put(`/deliveries/${id}`, {
+          recipient_id: data.recipient_id,
+          deliveryman_id: data.deliveryman_id,
+          product: data.product,
+        });
 
-        reset();
-        return navigation.navigate('/destinatários');
+        toast.success('Destinatário editado com sucesso!');
       }
 
-      await api.put(`/recipients/${id}`, {
-        recipient_id: data.recipient_id,
-        deliveryman_id: data.deliveryman_id,
-        product: data.product,
-      });
-
-      toast.success('Destinatário editado com sucesso!');
-
       reset();
-      return navigation.navigate('/destinatários');
+      return history.push('/encomendas');
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errorMessages = {};
@@ -99,6 +130,7 @@ export default function DeliveryForm({ match, navigation }) {
               placeholder="Selecione..."
               noOptionsMessage={() => 'Nenhum destinatário encontrado'}
               loadOptions={loadRecipientsOptions}
+              styles={customStylesSelectInput}
             />
 
             <Select
@@ -108,6 +140,7 @@ export default function DeliveryForm({ match, navigation }) {
               placeholder="Selecione..."
               noOptionsMessage={() => 'Nenhum entregador encontrado'}
               loadOptions={loadDeliverymenOptions}
+              styles={customStylesSelectInput}
             />
           </section>
           <Input type="text" label="Nome do produto" name="product" />

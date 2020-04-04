@@ -11,7 +11,7 @@ export default function SaveButton({ action }) {
       title="SALVAR"
       Icon={MdDone}
       action={action}
-      background={colors.darkPurple}
+      background={colors.primary}
     />
   );
 }

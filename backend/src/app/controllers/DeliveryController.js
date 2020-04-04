@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { Op } from 'sequelize';
 
 import File from '../models/File';
 import Delivery from '../models/Delivery';
@@ -48,16 +49,29 @@ const findConfig = {
 
 class DeliveryController {
   async index(req, res) {
-    const { page = 1 } = req.query;
+    const { q = '', page = 1, limit = 20 } = req.query;
 
     const deliveries = await Delivery.findAll({
-      where: { canceled_at: null },
-      limit: 20,
-      offset: (page - 1) * 20,
+      where: {
+        canceled_at: null,
+        product: {
+          [Op.iLike]: `${q}%`,
+        },
+      },
+      limit,
+      offset: (page - 1) * limit,
       ...findConfig,
     });
 
     res.json(deliveries);
+  }
+
+  async show(req, res) {
+    const { id } = req.params;
+
+    const delivery = await Delivery.findByPk(id, findConfig);
+
+    res.json(delivery);
   }
 
   async store(req, res) {
@@ -140,7 +154,7 @@ class DeliveryController {
         return res.status(400).json({ error: "recipient doesn't exists" });
       }
 
-      if (delivery.recipient_id !== recipient_id) {
+      if (delivery.recipient.id !== recipient_id) {
         return res
           .status(400)
           .json({ error: "doesn't allowed change recipient" });
@@ -154,7 +168,7 @@ class DeliveryController {
         return res.status(400).json({ error: "deliveryman doesn't exists" });
       }
 
-      if (delivery.deliveryman_id !== deliveryman_id) {
+      if (delivery.deliveryman.id !== deliveryman_id) {
         return res
           .status(400)
           .json({ error: "doesn't allowed change deliveryman" });

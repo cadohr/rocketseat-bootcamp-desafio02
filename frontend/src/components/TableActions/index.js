@@ -1,54 +1,43 @@
-import React, { useState } from 'react';
-import {
-  MdMoreHoriz,
-  MdRemoveRedEye,
-  MdModeEdit,
-  MdDeleteForever,
-} from 'react-icons/md';
+import React, { useState, useEffect, useRef } from 'react';
+import { MdMoreHoriz } from 'react-icons/md';
 
-import { Container, ActionList, Action } from './styles';
+import colors from '~/styles/colors';
 
-export default function TableActions({ actions = [] }) {
+import { Container, ActionList } from './styles';
+
+export default function TableActions({ children }) {
+  const nodeRef = useRef();
   const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleOutsideVisible);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideVisible);
+    };
+  }, []);
 
   function handleToggleVisible() {
     setVisible(!visible);
   }
 
+  function handleOutsideVisible(e) {
+    if (nodeRef.current.contains(e.target)) {
+      return;
+    }
+
+    setVisible(false);
+  }
+
   return (
     <Container>
       <button onClick={handleToggleVisible}>
-        <MdMoreHoriz size={16} color="#c6c6c6" />
+        <MdMoreHoriz size={16} color={colors.gray} />
       </button>
 
-      {actions.length > 0 && (
-        <ActionList visible={visible}>
-          {actions.includes('view') && (
-            <Action>
-              <button>
-                <MdRemoveRedEye color="#8e5be8" />
-                Visualizar
-              </button>
-            </Action>
-          )}
-          {actions.includes('edit') && (
-            <Action>
-              <button>
-                <MdModeEdit color="#4d85ee" />
-                Editar
-              </button>
-            </Action>
-          )}
-          {actions.includes('delete') && (
-            <Action>
-              <button>
-                <MdDeleteForever color="#de3b3b" />
-                Excluir
-              </button>
-            </Action>
-          )}
-        </ActionList>
-      )}
+      <ActionList ref={nodeRef} visible={visible}>
+        {children}
+      </ActionList>
     </Container>
   );
 }

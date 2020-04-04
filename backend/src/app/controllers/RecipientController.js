@@ -1,10 +1,39 @@
 import * as yup from 'yup';
+import { Op } from 'sequelize';
 
 import Recipient from '../models/Recipient';
 
 class RecipientController {
   async index(req, res) {
+    const { q = '', page = 1, limit = 5 } = req.query;
+
     const recipients = await Recipient.findAll({
+      where: {
+        name: {
+          [Op.iLike]: `${q}%`,
+        },
+      },
+      attributes: [
+        'id',
+        'name',
+        'street',
+        'number',
+        'complement',
+        'city',
+        'state',
+        'postcode',
+      ],
+      limit,
+      offset: (page - 1) * limit,
+    });
+
+    res.json(recipients);
+  }
+
+  async show(req, res) {
+    const { id } = req.params;
+
+    const recipient = await Recipient.findByPk(id, {
       attributes: [
         'id',
         'name',
@@ -17,7 +46,7 @@ class RecipientController {
       ],
     });
 
-    res.json(recipients);
+    res.json(recipient);
   }
 
   async store(req, res) {
@@ -25,7 +54,7 @@ class RecipientController {
       name: yup.string().required(),
       street: yup.string().required(),
       number: yup.string().required(),
-      complement: yup.string().required(),
+      complement: yup.string(),
       city: yup.string().required(),
       state: yup.string().required(),
       postcode: yup.string().required(),
@@ -98,6 +127,18 @@ class RecipientController {
       state,
       postcode,
     });
+  }
+
+  async destroy(req, res) {
+    const recipient = await Recipient.findByPk(req.params.id);
+
+    if (!recipient) {
+      return res.status(400).json({ error: "recipient doesn't exists" });
+    }
+
+    await recipient.destroy();
+
+    return res.json({ message: 'OK' });
   }
 }
 

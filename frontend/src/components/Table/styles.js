@@ -8,7 +8,7 @@ export const Wrapper = styled.table`
   border-spacing: 0 15px;
 
   thead th {
-    color: ${colors.gray27};
+    color: ${colors.darkGray};
     text-align: left;
     font-size: 16px;
     padding: 12px;
@@ -20,9 +20,9 @@ export const Wrapper = styled.table`
   }
 
   tbody td {
-    color: ${colors.gray40};
+    color: ${colors.gray};
     background: ${colors.white};
-    padding: 12px;
+    padding: 10px 12px;
     font-size: 16px;
     vertical-align: middle;
 
@@ -43,9 +43,15 @@ export const Wrapper = styled.table`
       > span {
         margin-left: 10px;
       }
+
+      > img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+      }
     }
 
-    img {
+    > img {
       width: 35px;
       height: 35px;
       border-radius: 50%;

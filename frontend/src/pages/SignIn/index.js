@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Form } from '@unform/core';
+import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
 import Input from '~/components/Form/SimpleInput';

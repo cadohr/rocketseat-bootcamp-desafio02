@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import colors from '~/styles/colors';
+
 export const Container = styled.div`
   display: flex;
   align-items: center;
@@ -9,7 +11,7 @@ export const Container = styled.div`
   button {
     background: none;
     border: 0;
-    color: #999;
+    color: ${colors.gray};
   }
 `;
 
@@ -18,7 +20,7 @@ export const ActionList = styled.div`
   width: 150px;
   left: calc(50% - 75px);
   top: calc(100% + 10px);
-  background: #fff;
+  background: ${colors.white};
   z-index: 1;
 
   border-radius: 4px;
@@ -42,16 +44,21 @@ export const ActionList = styled.div`
 
     box-shadow: -2px 2px 2px 0px rgba(0, 0, 0, 0.1);
   }
-`;
 
-export const Action = styled.div`
-  svg {
-    margin-right: 10px;
-  }
+  > div {
+    button {
+      display: flex;
+      align-items: center;
 
-  & + div {
-    margin-top: 5px;
-    padding-top: 5px;
-    border-top: 1px solid #eee;
+      svg {
+        margin-right: 10px;
+      }
+    }
+
+    & + div {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid ${colors.lightGray};
+    }
   }
 `;

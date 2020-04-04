@@ -5,6 +5,8 @@ import DeliveryProblem from '../models/DeliveryProblem';
 
 class DeliveryProblemController {
   async index(req, res) {
+    const { page = 1, limit = 20 } = req.query;
+
     const deliveryProblems = await DeliveryProblem.findAll({
       attributes: ['id', 'description'],
       include: [
@@ -14,6 +16,8 @@ class DeliveryProblemController {
           attributes: ['id'],
         },
       ],
+      limit,
+      offset: (page - 1) * limit,
     });
 
     res.json(deliveryProblems);

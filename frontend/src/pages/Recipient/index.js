@@ -3,32 +3,46 @@ import React, { useState, useEffect } from 'react';
 import api from '~/services/api';
 
 import Table from '~/components/Table';
-import TableActions from '~/components/TableActions';
 import HeaderList from '~/components/HeaderList';
+import { SearchInput } from '~/components/Form';
+import { RegisterButton } from '~/components/Button';
+
+import Item from './Item';
 
 import { Container } from './styles';
 
 export default function Recipient() {
+  const [page, setPage] = useState(1);
   const [recipients, setRecipients] = useState([]);
 
+  async function loadRecipients(q) {
+    const response = await api.get('recipients', {
+      params: { q, page },
+    });
+
+    setRecipients(response.data);
+  }
+
+  async function handleSearch(e) {
+    setPage(1);
+    loadRecipients(e.target.value);
+  }
+
   useEffect(() => {
-    async function loadRecipients() {
-      const response = await api.get('recipients');
-
-      setRecipients(response.data);
-    }
-
-    loadRecipients();
-  });
+    loadRecipients('');
+  }, [page]); //eslint-disable-line
 
   return (
     <Container>
-      <HeaderList
-        title="Gerenciamento de Destinatários"
-        searchTitle="Buscar por destinatários"
-        buttonTitle="CADASTRAR"
-        to="/destinatarios/cadastrar"
-      />
+      <HeaderList title="Gerenciamento de Destinatários">
+        <SearchInput
+          type="text"
+          name="search"
+          onChange={handleSearch}
+          placeholder="Buscar por destinatários"
+        />
+        <RegisterButton to="/destinatarios/cadastrar" />
+      </HeaderList>
 
       {(recipients.length > 0 && (
         <Table>
@@ -42,17 +56,11 @@ export default function Recipient() {
           </thead>
           <tbody>
             {recipients.map(recipient => (
-              <tr key={recipient.id}>
-                <td>#{recipient.id}</td>
-                <td>{recipient.name}</td>
-                <td>
-                  {recipient.street}, {recipient.number}, {recipient.city} -{' '}
-                  {recipient.state}
-                </td>
-                <td>
-                  <TableActions actions={['view', 'edit', 'delete']} />
-                </td>
-              </tr>
+              <Item
+                key={recipient.id}
+                recipient={recipient}
+                loadRecipients={loadRecipients}
+              />
             ))}
           </tbody>
         </Table>

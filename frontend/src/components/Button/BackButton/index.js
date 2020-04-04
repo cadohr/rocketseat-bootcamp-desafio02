@@ -11,7 +11,7 @@ export default function BackButton({ to }) {
       title="VOLTAR"
       Icon={MdKeyboardArrowLeft}
       to={to}
-      background={colors.gainsboro}
+      background={colors.lightGray}
     />
   );
 }

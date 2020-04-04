@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+import colors from '~/styles/colors';
+
 export const Container = styled.div`
-  background: #fff;
+  background: ${colors.white};
   padding: 0 20px;
 `;
 
@@ -22,18 +24,18 @@ export const Content = styled.div`
       height: 26px;
       margin-right: 20px;
       padding-right: 20px;
-      border-right: 1px solid #eee;
+      border-right: 1px solid ${colors.lightGray};
     }
 
     a {
       font-size: 15px;
       font-weight: bold;
-      color: #999;
+      color: ${colors.gray};
       margin-right: 20px;
     }
 
     a.selected {
-      color: #444;
+      color: ${colors.darkGray};
     }
   }
 
@@ -46,7 +48,7 @@ export const Content = styled.div`
       font-size: 14px;
 
       strong {
-        color: #444;
+        color: ${colors.darkGray};
       }
 
       button {

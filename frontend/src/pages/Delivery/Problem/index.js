@@ -1,24 +1,62 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { MdDeleteForever } from 'react-icons/md';
+
+import api from '~/services/api';
 
 import Table from '~/components/Table';
 import TableActions from '~/components/TableActions';
+import HeaderList from '~/components/HeaderList';
+import Modal from '~/components/Modal';
+
+import colors from '~/styles/colors';
 
 import { Container } from './styles';
 
 export default function DeliveryProblem() {
+  const [page] = useState(1);
   const [problems, setProblems] = useState([]);
+
+  async function handleCancel(problemId) {
+    const confirm = window.confirm(
+      'Você tem certeza que deseja cancelar essa encomenda?'
+    );
+
+    if (!confirm) {
+      return;
+    }
+
+    try {
+      await api.delete(`/problems/${problemId}/cancel-delivery`);
+      loadDeliveryProblems();
+      toast.success('Encomenda cancelada com sucesso!');
+    } catch (err) {
+      toast.error('Essa encomenda não pode ser cancelada.');
+    }
+  }
+
+  async function loadDeliveryProblems() {
+    const response = await api.get('/problems', {
+      params: { page },
+    });
+
+    setProblems(response.data);
+  }
+
+  useEffect(() => {
+    loadDeliveryProblems();
+  }, [page]); // eslint-disable-line
 
   return (
     <Container>
-      <h1>Problemas na Entrega</h1>
+      <HeaderList title="Problemas na Entrega" />
 
       {(problems.length > 0 && (
         <Table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Endereço</th>
+              <th>Encomenda</th>
+              <th>Problema</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -26,13 +64,29 @@ export default function DeliveryProblem() {
             {problems.map(problem => (
               <tr key={problem.id}>
                 <td>#{problem.id}</td>
-                <td>{problem.name}</td>
+                <td>{problem.description}</td>
                 <td>
-                  {problem.street}, {problem.number}, {problem.city} -{' '}
-                  {problem.state}
-                </td>
-                <td>
-                  <TableActions actions={['view', 'edit', 'delete']} />
+                  <TableActions>
+                    <div>
+                      <Modal>
+                        <section>
+                          <strong>VISUALIZAR PROBLEMA</strong>
+                          <span>{problem.description}</span>
+                        </section>
+                      </Modal>
+                    </div>
+
+                    <div>
+                      <button
+                        onClick={() => {
+                          handleCancel(problem.id);
+                        }}
+                      >
+                        <MdDeleteForever color={colors.actions.delete} />
+                        Excluir
+                      </button>
+                    </div>
+                  </TableActions>
                 </td>
               </tr>
             ))}
