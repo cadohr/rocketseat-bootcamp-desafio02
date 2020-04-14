@@ -7,10 +7,10 @@ export default {
   darkRed: '#B0171F',
 
   status: {
-    delivered: '#dff0df',
-    withdrawal: '#bad2ff',
-    canceled: '#fab0b0',
-    pending: '#f0f0df',
+    entregue: '#dff0df',
+    retirada: '#bad2ff',
+    canceleda: '#fab0b0',
+    pendente: '#f0f0df',
   },
 
   avatar: ['#dff0df', '#bad2ff', '#fab0b0', '#f0f0df', '#f4f9ef'],

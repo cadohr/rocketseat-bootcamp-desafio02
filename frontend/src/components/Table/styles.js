@@ -30,15 +30,15 @@ export const Wrapper = styled.table`
       text-align: center;
     }
 
+    .sb-avatar {
+      border-radius: 50%;
+      overflow: hidden;
+      font-size: 36px;
+    }
+
     div {
       display: flex;
       align-items: center;
-
-      .sb-avatar {
-        border-radius: 50%;
-        overflow: hidden;
-        font-size: 36px;
-      }
 
       > span {
         margin-left: 10px;

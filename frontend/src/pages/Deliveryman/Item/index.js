@@ -10,7 +10,7 @@ import colors from '~/styles/colors';
 
 import TableActions from '~/components/TableActions';
 
-export default function Item({ deliveryman, loadDeliverymen }) {
+export default function Item({ deliveryman, loadDeliverymen, setPage }) {
   async function handleDelete(deliverymanId) {
     const confirm = window.confirm(
       'Você tem certeza que deseja deletar essa encomenda?'
@@ -22,6 +22,7 @@ export default function Item({ deliveryman, loadDeliverymen }) {
 
     try {
       await api.delete(`/deliverymen/${deliverymanId}`);
+      setPage(1);
       loadDeliverymen('');
       toast.success('Entregador apagado com sucesso!');
     } catch (err) {
@@ -34,7 +35,7 @@ export default function Item({ deliveryman, loadDeliverymen }) {
       <tr key={deliveryman.id}>
         <td>#{deliveryman.id}</td>
         <td>
-          {deliveryman.avatar.url ? (
+          {deliveryman.avatar ? (
             <img src={deliveryman.avatar.url} alt={deliveryman.name} />
           ) : (
             <ConfigProvider

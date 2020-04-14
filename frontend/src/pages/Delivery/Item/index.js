@@ -13,7 +13,7 @@ import colors from '~/styles/colors';
 
 import { Status } from './styles';
 
-export default function Item({ delivery, loadDeliveries }) {
+export default function Item({ delivery, loadDeliveries, setPage }) {
   async function handleDelete(deliveryId) {
     const confirm = window.confirm(
       'Você tem certeza que deseja deletar essa encomenda?'
@@ -25,6 +25,7 @@ export default function Item({ delivery, loadDeliveries }) {
 
     try {
       await api.delete(`/deliveries/${deliveryId}`);
+      setPage(1);
       loadDeliveries('');
       toast.success('Encomenda apagada com sucesso!');
     } catch (err) {
@@ -60,7 +61,9 @@ export default function Item({ delivery, loadDeliveries }) {
         <td>{delivery.recipient.city}</td>
         <td>{delivery.recipient.state}</td>
         <td>
-          <Status color={colors.status.delivered}>ENTREGUE</Status>
+          <Status color={colors.status[delivery.status]}>
+            {delivery.status}
+          </Status>
         </td>
         <td>
           <TableActions>
@@ -80,11 +83,11 @@ export default function Item({ delivery, loadDeliveries }) {
                   <strong>Datas</strong>
                   <span>
                     <strong>Retirada:</strong>
-                    {delivery.start_date}
+                    {delivery.startDateFormatted}
                   </span>
                   <span>
                     <strong>Entrega:</strong>
-                    {delivery.end_date}
+                    {delivery.endDateFormatted}
                   </span>
                 </section>
 

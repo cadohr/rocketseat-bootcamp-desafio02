@@ -9,7 +9,7 @@ import colors from '~/styles/colors';
 
 import TableActions from '~/components/TableActions';
 
-export default function Item({ recipient, loadRecipients }) {
+export default function Item({ recipient, loadRecipients, setPage }) {
   async function handleDelete(recipientId) {
     const confirm = window.confirm(
       'Você tem certeza que deseja deletar essa encomenda?'
@@ -21,6 +21,7 @@ export default function Item({ recipient, loadRecipients }) {
 
     try {
       await api.delete(`/recipients/${recipientId}`);
+      setPage(1);
       loadRecipients('');
       toast.success('Destinatário apagado com sucesso!');
     } catch (err) {

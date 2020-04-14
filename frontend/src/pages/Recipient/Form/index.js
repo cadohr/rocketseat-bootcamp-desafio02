@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import api from '~/services/api';
 import history from '~/services/history';
 
-import { Input } from '~/components/Form';
+import { Input, MaskedInput } from '~/components/Form';
 import HeaderForm from '~/components/HeaderForm';
 import { BackButton, SaveButton } from '~/components/Button';
 
@@ -21,10 +21,15 @@ export default function RecipientForm({ match }) {
   useEffect(() => {
     async function loadRecipient() {
       if (id) {
-        const response = await api.get(`recipients/${id}`);
-        console.tron.log(response);
+        const { data } = await api.get(`recipients/${id}`);
 
-        formRef.current.setData(response.data);
+        formRef.current.setData({
+          ...data,
+          postcode: data.postcode.replace(
+            /^([\d]{2})\.?([\d]{3})-?([\d]{3})/,
+            '$1.$2-$3'
+          ),
+        });
       }
     }
 
@@ -47,28 +52,22 @@ export default function RecipientForm({ match }) {
 
       await schema.validate(data, { abortEarly: false });
 
+      const body = {
+        name: data.name,
+        street: data.street,
+        number: data.number,
+        complement: data.complement,
+        city: data.city,
+        state: data.state,
+        postcode: data.postcode.replace(/\D/g, ''),
+      };
+
       if (!id) {
-        await api.post('/recipients', {
-          name: data.name,
-          street: data.street,
-          number: data.number,
-          complement: data.complement,
-          city: data.city,
-          state: data.state,
-          postcode: data.postcode,
-        });
+        await api.post('/recipients', body);
 
         toast.success('Destinatário cadastrado com sucesso!');
       } else {
-        await api.put(`/recipients/${id}`, {
-          name: data.name,
-          street: data.street,
-          number: data.number,
-          complement: data.complement,
-          city: data.city,
-          state: data.state,
-          postcode: data.postcode,
-        });
+        await api.put(`/recipients/${id}`, body);
 
         toast.success('Destinatário editado com sucesso!');
       }
@@ -118,7 +117,12 @@ export default function RecipientForm({ match }) {
               <Input type="text" name="state" label="Estado" />
             </InputGroup>
             <InputGroup>
-              <Input type="text" name="postcode" label="CEP" />
+              <MaskedInput
+                type="text"
+                name="postcode"
+                label="CEP"
+                mask="99.999-999"
+              />
             </InputGroup>
           </section>
         </Form>

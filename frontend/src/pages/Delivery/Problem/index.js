@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
 import { MdDeleteForever } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import Pagination from 'rc-pagination';
 
 import api from '~/services/api';
 
@@ -14,7 +15,9 @@ import colors from '~/styles/colors';
 import { Container } from './styles';
 
 export default function DeliveryProblem() {
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(5);
+  const [problemsCount, setProblemsCount] = useState(0);
   const [problems, setProblems] = useState([]);
 
   async function handleCancel(problemId) {
@@ -37,10 +40,15 @@ export default function DeliveryProblem() {
 
   async function loadDeliveryProblems() {
     const response = await api.get('/problems', {
-      params: { page },
+      params: { page, limit: perPage },
     });
 
-    setProblems(response.data);
+    setProblems(response.data.rows);
+    setProblemsCount(response.data.count);
+  }
+
+  async function handlePagination(current) {
+    setPage(current);
   }
 
   useEffect(() => {
@@ -52,46 +60,56 @@ export default function DeliveryProblem() {
       <HeaderList title="Problemas na Entrega" />
 
       {(problems.length > 0 && (
-        <Table>
-          <thead>
-            <tr>
-              <th>Encomenda</th>
-              <th>Problema</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {problems.map(problem => (
-              <tr key={problem.id}>
-                <td>#{problem.id}</td>
-                <td>{problem.description}</td>
-                <td>
-                  <TableActions>
-                    <div>
-                      <Modal>
-                        <section>
-                          <strong>VISUALIZAR PROBLEMA</strong>
-                          <span>{problem.description}</span>
-                        </section>
-                      </Modal>
-                    </div>
-
-                    <div>
-                      <button
-                        onClick={() => {
-                          handleCancel(problem.id);
-                        }}
-                      >
-                        <MdDeleteForever color={colors.actions.delete} />
-                        Excluir
-                      </button>
-                    </div>
-                  </TableActions>
-                </td>
+        <>
+          {problemsCount > perPage && (
+            <Pagination
+              current={page}
+              pageSize={perPage}
+              total={problemsCount}
+              onChange={handlePagination}
+            />
+          )}
+          <Table>
+            <thead>
+              <tr>
+                <th>Encomenda</th>
+                <th>Problema</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {problems.map(problem => (
+                <tr key={problem.id}>
+                  <td>#{problem.id}</td>
+                  <td>{problem.description}</td>
+                  <td>
+                    <TableActions>
+                      <div>
+                        <Modal>
+                          <section>
+                            <strong>VISUALIZAR PROBLEMA</strong>
+                            <span>{problem.description}</span>
+                          </section>
+                        </Modal>
+                      </div>
+
+                      <div>
+                        <button
+                          onClick={() => {
+                            handleCancel(problem.id);
+                          }}
+                        >
+                          <MdDeleteForever color={colors.actions.delete} />
+                          Excluir
+                        </button>
+                      </div>
+                    </TableActions>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </>
       )) || <span>Não há entregas com problemas</span>}
     </Container>
   );

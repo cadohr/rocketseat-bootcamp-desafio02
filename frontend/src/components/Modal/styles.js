@@ -39,6 +39,7 @@ export const Container = styled.div`
 
       strong {
         color: ${colors.gray};
+        margin-right: 10px;
       }
     }
 

@@ -7,6 +7,7 @@ export const Status = styled.div`
   color: ${props => darken(0.4, props.color)};
   font-size: 14px;
   font-weight: bold;
+  text-transform: uppercase;
 
   &::before {
     content: '';
