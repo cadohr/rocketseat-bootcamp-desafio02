@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as Yup from 'yup';
 
 import Delivery from '../models/Delivery';
 import DeliveryProblem from '../models/DeliveryProblem';
@@ -7,8 +7,8 @@ class DeliveryProblemController {
   async index(req, res) {
     const { page = 1, limit = 20 } = req.query;
 
-    const deliveryProblems = await DeliveryProblem.findAll({
-      attributes: ['id', 'description'],
+    const deliveryProblems = await DeliveryProblem.findAndCountAll({
+      attributes: ['id', 'description', 'created_at'],
       include: [
         {
           model: Delivery,
@@ -18,6 +18,7 @@ class DeliveryProblemController {
       ],
       limit,
       offset: (page - 1) * limit,
+      order: [['created_at', 'DESC']],
     });
 
     res.json(deliveryProblems);
@@ -30,7 +31,7 @@ class DeliveryProblemController {
       where: {
         delivery_id: deliveryId,
       },
-      attributes: ['id', 'description'],
+      attributes: ['id', 'description', 'created_at'],
       include: [
         {
           model: Delivery,
@@ -44,8 +45,8 @@ class DeliveryProblemController {
   }
 
   async store(req, res) {
-    const schema = yup.object().shape({
-      description: yup.string().required(),
+    const schema = Yup.object().shape({
+      description: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -62,10 +63,13 @@ class DeliveryProblemController {
       return res.status(400).json({ error: "delivery doesn't exists" });
     }
 
-    const { id } = await DeliveryProblem.create(req.body);
+    const { id } = await DeliveryProblem.create({
+      ...req.body,
+      delivery_id: deliveryId,
+    });
 
     const deliveryProblem = await DeliveryProblem.findByPk(id, {
-      attributes: ['id', 'description'],
+      attributes: ['id', 'description', 'created_at'],
     });
 
     res.json(deliveryProblem);

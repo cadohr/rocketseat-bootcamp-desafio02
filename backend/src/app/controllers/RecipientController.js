@@ -1,13 +1,13 @@
-import * as yup from 'yup';
+import * as Yup from 'yup';
 import { Op } from 'sequelize';
 
 import Recipient from '../models/Recipient';
 
 class RecipientController {
   async index(req, res) {
-    const { q = '', page = 1, limit = 5 } = req.query;
+    const { q = '', page = 1, limit = 20 } = req.query;
 
-    const recipients = await Recipient.findAll({
+    const recipients = await Recipient.findAndCountAll({
       where: {
         name: {
           [Op.iLike]: `${q}%`,
@@ -25,6 +25,7 @@ class RecipientController {
       ],
       limit,
       offset: (page - 1) * limit,
+      order: [['created_at', 'DESC']],
     });
 
     res.json(recipients);
@@ -50,14 +51,14 @@ class RecipientController {
   }
 
   async store(req, res) {
-    const schema = yup.object().shape({
-      name: yup.string().required(),
-      street: yup.string().required(),
-      number: yup.string().required(),
-      complement: yup.string(),
-      city: yup.string().required(),
-      state: yup.string().required(),
-      postcode: yup.string().required(),
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      street: Yup.string().required(),
+      number: Yup.string().required(),
+      complement: Yup.string(),
+      city: Yup.string().required(),
+      state: Yup.string().required(),
+      postcode: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -88,14 +89,14 @@ class RecipientController {
   }
 
   async update(req, res) {
-    const schema = yup.object().shape({
-      name: yup.string().required(),
-      street: yup.string().required(),
-      number: yup.string().required(),
-      complement: yup.string().required(),
-      city: yup.string().required(),
-      state: yup.string().required(),
-      postcode: yup.string().required(),
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      street: Yup.string().required(),
+      number: Yup.string().required(),
+      complement: Yup.string().required(),
+      city: Yup.string().required(),
+      state: Yup.string().required(),
+      postcode: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {

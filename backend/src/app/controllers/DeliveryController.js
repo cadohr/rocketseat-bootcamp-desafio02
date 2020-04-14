@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as Yup from 'yup';
 import { Op } from 'sequelize';
 
 import File from '../models/File';
@@ -11,7 +11,14 @@ import DeliveryRegistrationMail from '../jobs/DeliveryRegistrationMail';
 import DeliveryCancellationMail from '../jobs/DeliveryCancellationMail';
 
 const findConfig = {
-  attributes: ['id', 'product', 'start_date', 'end_date', 'canceled_at'],
+  attributes: [
+    'id',
+    'product',
+    'start_date',
+    'end_date',
+    'canceled_at',
+    'status',
+  ],
   include: [
     {
       model: Recipient,
@@ -30,7 +37,7 @@ const findConfig = {
     {
       model: Deliveryman,
       as: 'deliveryman',
-      attributes: ['id', 'name'],
+      attributes: ['id', 'name', 'email'],
       include: [
         {
           model: File,
@@ -51,16 +58,17 @@ class DeliveryController {
   async index(req, res) {
     const { q = '', page = 1, limit = 20 } = req.query;
 
-    const deliveries = await Delivery.findAll({
+    const deliveries = await Delivery.findAndCountAll({
       where: {
         canceled_at: null,
         product: {
           [Op.iLike]: `${q}%`,
         },
       },
+      ...findConfig,
       limit,
       offset: (page - 1) * limit,
-      ...findConfig,
+      order: [['created_at', 'DESC']],
     });
 
     res.json(deliveries);
@@ -75,16 +83,14 @@ class DeliveryController {
   }
 
   async store(req, res) {
-    const schema = yup.object().shape({
-      recipient_id: yup
-        .number()
+    const schema = Yup.object().shape({
+      recipient_id: Yup.number()
         .positive()
         .required(),
-      deliveryman_id: yup
-        .number()
+      deliveryman_id: Yup.number()
         .positive()
         .required(),
-      product: yup.string().required(),
+      product: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -128,11 +134,11 @@ class DeliveryController {
   }
 
   async update(req, res) {
-    const schema = yup.object().shape({
-      recipient_id: yup.number().positive(),
-      deliveryman_id: yup.number().positive(),
-      product: yup.string(),
-      signature_id: yup.number().positive(),
+    const schema = Yup.object().shape({
+      recipient_id: Yup.number().positive(),
+      deliveryman_id: Yup.number().positive(),
+      product: Yup.string(),
+      signature_id: Yup.number().positive(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -189,7 +195,7 @@ class DeliveryController {
   }
 
   async destroy(req, res) {
-    const delivery = await Delivery.findByPk(req.params.id);
+    const delivery = await Delivery.findByPk(req.params.id, findConfig);
 
     if (!delivery) {
       return res.status(400).json({ error: "delivery doesn't exists" });

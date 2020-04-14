@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as Yup from 'yup';
 
 import { Op } from 'sequelize';
 import { parseISO, getHours, startOfDay, endOfDay } from 'date-fns';
@@ -11,7 +11,7 @@ import Recipient from '../models/Recipient';
 class DeliverymanDeliveryController {
   async index(req, res) {
     const { id } = req.params;
-    const { delivered = true, page = 1, limit = 20 } = req.query;
+    const { delivered = false, page = 1, limit = 20 } = req.query;
 
     const deliveryman = await Deliveryman.findByPk(id);
 
@@ -19,24 +19,32 @@ class DeliverymanDeliveryController {
       return res.status(400).json({ error: "deliveryman doesn't exists" });
     }
 
-    const subquery = delivered
-      ? {
-          canceled_at: { [Op.eq]: null },
-          end_date: { [Op.ne]: null },
-        }
-      : {
-          [Op.or]: {
-            canceled_at: { [Op.ne]: null },
-            end_date: { [Op.eq]: null },
-          },
-        };
+    const subquery =
+      delivered === 'true'
+        ? {
+            canceled_at: { [Op.eq]: null },
+            end_date: { [Op.ne]: null },
+          }
+        : {
+            [Op.or]: {
+              canceled_at: { [Op.ne]: null },
+              end_date: { [Op.eq]: null },
+            },
+          };
 
     const deliveries = await Delivery.findAll({
       where: {
         deliveryman_id: id,
         ...subquery,
       },
-      attributes: ['id', 'product', 'canceled_at', 'start_date', 'end_date'],
+      attributes: [
+        'id',
+        'product',
+        'canceled_at',
+        'start_date',
+        'end_date',
+        'status',
+      ],
       include: [
         {
           model: File,
@@ -72,28 +80,25 @@ class DeliverymanDeliveryController {
       ],
       limit,
       offset: (page - 1) * limit,
+      order: [['created_at', 'DESC']],
     });
 
     return res.json(deliveries);
   }
 
   async update(req, res) {
-    const schema = yup.schema.object({
-      startDate: yup
-        .date()
-        .when('endDate', (endDate, field) =>
-          endDate ? field : field.required()
-        ),
-      endDate: yup
-        .date()
-        .when('startDate', (startDate, field) =>
-          startDate ? field : field.required()
-        ),
-      signatureId: yup
-        .number()
-        .when('endDate', (endDate, field) =>
-          endDate ? field.required() : field
-        ),
+    const schema = Yup.object().shape({
+      start_date: Yup.date(),
+      end_date: Yup.date(),
+      // start_date: Yup.date().when('end_date', (endDate, field) =>
+      //   endDate ? field : field.required()
+      // ),
+      // end_date: Yup.date().when('start_date', (startDate, field) => {
+      //   startDate ? field : field.required();
+      // }),
+      signature_id: Yup.number().when('end_date', (endDate, field) =>
+        endDate ? field.required() : field
+      ),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -126,7 +131,11 @@ class DeliverymanDeliveryController {
         .json({ error: 'delivery has already been closed' });
     }
 
-    const { startDate, endDate, signatureId } = req.body;
+    const {
+      start_date: startDate,
+      end_date: endDate,
+      signature_id: signatureId,
+    } = req.body;
 
     if (startDate) {
       const parsedStartDate = parseISO(startDate);

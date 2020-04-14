@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as Yup from 'yup';
 import { Op } from 'sequelize';
 
 import File from '../models/File';
@@ -8,7 +8,7 @@ class DeliverymanController {
   async index(req, res) {
     const { q = '', page = 1, limit = 20 } = req.query;
 
-    const deliverymen = await Deliveryman.findAll({
+    const deliverymen = await Deliveryman.findAndCountAll({
       where: {
         name: {
           [Op.iLike]: `${q}%`,
@@ -24,6 +24,7 @@ class DeliverymanController {
       ],
       limit,
       offset: (page - 1) * limit,
+      order: [['created_at', 'DESC']],
     });
 
     res.json(deliverymen);
@@ -33,7 +34,7 @@ class DeliverymanController {
     const { id } = req.params;
 
     const deliveryman = await Deliveryman.findByPk(id, {
-      attributes: ['id', 'name', 'email'],
+      attributes: ['id', 'name', 'email', 'created_at'],
       include: [
         {
           model: File,
@@ -47,14 +48,12 @@ class DeliverymanController {
   }
 
   async store(req, res) {
-    const schema = yup.object().shape({
-      name: yup
-        .string()
+    const schema = Yup.object().shape({
+      name: Yup.string()
         .required()
         .min(1)
         .max(255),
-      email: yup
-        .string()
+      email: Yup.string()
         .email()
         .required(),
     });
@@ -69,13 +68,12 @@ class DeliverymanController {
   }
 
   async update(req, res) {
-    const schema = yup.object().shape({
-      name: yup
-        .string()
+    const schema = Yup.object().shape({
+      name: Yup.string()
         .min(1)
         .max(255),
-      email: yup.string().email(),
-      avatar_id: yup.number(),
+      email: Yup.string().email(),
+      avatar_id: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
