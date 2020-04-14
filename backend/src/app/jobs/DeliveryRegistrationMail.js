@@ -13,7 +13,7 @@ class DeliveryRegistrationMail {
       subject: 'Entrega cadastrada',
       template: 'delivery/registration',
       context: {
-        deliveryman: delivery.deliveryman.name,
+        deliveryman: delivery.deliveryman,
         recipient: delivery.recipient,
         product: delivery.product,
       },

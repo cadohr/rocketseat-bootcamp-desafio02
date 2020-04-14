@@ -13,7 +13,7 @@ class DeliveryCancellationMail {
       subject: 'Entrega cancelada',
       template: 'delivery/cancellation',
       context: {
-        deliveryman: delivery.deliveryman.name,
+        deliveryman: delivery.deliveryman,
         recipient: delivery.recipient,
         product: delivery.product,
       },
