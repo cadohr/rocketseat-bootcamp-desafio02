@@ -40,7 +40,7 @@ export default function Item({ delivery, loadDeliveries, setPage }) {
         <td>{delivery.recipient.name}</td>
         <td>
           <div>
-            {delivery.deliveryman.avatar.url ? (
+            {delivery.deliveryman.avatar ? (
               <img
                 src={delivery.deliveryman.avatar.url}
                 alt={delivery.deliveryman.name}

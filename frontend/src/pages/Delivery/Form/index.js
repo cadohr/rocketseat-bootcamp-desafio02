@@ -53,7 +53,7 @@ export default function DeliveryForm({ match }) {
       },
     });
 
-    const data = response.data.map(item => ({
+    const data = response.data.rows.map(item => ({
       value: item.id,
       label: item.name,
     }));
