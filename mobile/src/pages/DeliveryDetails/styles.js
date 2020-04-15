@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { Platform } from 'react-native';
 import { lighten } from 'polished';
 
 import colors from '~/styles/colors';
@@ -9,6 +10,12 @@ export const Container = styled.View`
   padding: 20px;
   flex: 1;
   background: ${colors.white};
+`;
+
+export const Detail = styled.ScrollView.attrs({
+  showsVerticalScrollIndicator: false,
+})`
+  margin-top: ${Platform.OS === 'ios' ? '-100px' : '-160px'};
 `;
 
 export const Content = styled.View`
@@ -70,6 +77,7 @@ export const Action = styled.TouchableOpacity`
 export const ActionTitle = styled(Text)`
   text-align: center;
   color: ${colors.gray};
+  font-size: 13px;
 
   margin-top: 5px;
 `;

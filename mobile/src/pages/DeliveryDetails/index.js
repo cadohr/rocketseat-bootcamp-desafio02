@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Alert } from 'react-native';
+import { ScrollView, View, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import api from '~/services/api';
@@ -10,6 +10,7 @@ import Background from '~/components/Background';
 
 import {
   Container,
+  Detail,
   Content,
   TitleContainer,
   Title,
@@ -43,96 +44,104 @@ export default function DeliveryDetails({ route, navigation }) {
     <>
       <Background />
       <Container>
-        <Content style={{ marginTop: -100 }}>
-          <TitleContainer>
-            <Icon name="local-shipping" size={24} color={colors.primary} />
-            <Title>Informações da entrega</Title>
-          </TitleContainer>
-          <InfoContainer>
-            <Label>DESTINATÁRIO</Label>
-            <Info>{data.recipient.name}</Info>
+        <Detail>
+          <Content>
+            <TitleContainer>
+              <Icon name="local-shipping" size={24} color={colors.primary} />
+              <Title>Informações da entrega</Title>
+            </TitleContainer>
+            <InfoContainer>
+              <Label>DESTINATÁRIO</Label>
+              <Info>{data.recipient.name}</Info>
 
-            <Label>ENDEREÇO DE ENTREGA</Label>
-            <Info>
-              {data.recipient.street}, {data.recipient.number},{' '}
-              {data.recipient.city} - {data.recipient.state},{' '}
-              {data.recipient.postcode}
-            </Info>
-
-            <Label>PRODUTO</Label>
-            <Info>{data.product}</Info>
-          </InfoContainer>
-        </Content>
-
-        <Content>
-          <TitleContainer>
-            <Icon name="event" size={24} color={colors.primary} />
-            <Title>Situação da entrega</Title>
-          </TitleContainer>
-          <InfoContainer>
-            <Label>STATUS</Label>
-            <Info style={{ textTransform: 'capitalize' }}>{data.status}</Info>
-          </InfoContainer>
-
-          <InfoContainer
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            <View>
-              <Label>DATA DE RETIRADA</Label>
+              <Label>ENDEREÇO DE ENTREGA</Label>
               <Info>
-                {data.startDateFormatted
-                  ? data.startDateFormatted
-                  : '- - / - - / - -'}
+                {data.recipient.street}, {data.recipient.number},{' '}
+                {data.recipient.city} - {data.recipient.state},{' '}
+                {data.recipient.postcode}
               </Info>
-            </View>
-            <View>
-              <Label>DATA DE ENTREGA</Label>
-              <Info>
-                {data.endDateFormatted
-                  ? data.endDateFormatted
-                  : '- - / - - / - -'}
-              </Info>
-            </View>
-          </InfoContainer>
-        </Content>
 
-        {!data.endDateFormatted && (
-          <ActionList>
-            {!data.startDateFormatted ? (
-              <Action onPress={handleWithdraw}>
-                <Icon name="trending-flat" size={24} color={colors.primary} />
-                <ActionTitle>Retirar{`\n`}Entrega</ActionTitle>
-              </Action>
-            ) : (
-              <>
-                <Action
-                  onPress={() =>
-                    navigation.navigate('CreateProblem', { id: data.id })
-                  }
-                >
-                  <Icon name="highlight-off" size={24} color={colors.red} />
-                  <ActionTitle>Informar{`\n`}Problema</ActionTitle>
-                </Action>
+              <Label>PRODUTO</Label>
+              <Info>{data.product}</Info>
+            </InfoContainer>
+          </Content>
 
-                <Action
-                  onPress={() => navigation.navigate('ViewProblems', { data })}
-                >
-                  <Icon name="info-outline" size={24} color={colors.yellow} />
-                  <ActionTitle>Visualizar{`\n`}Problemas</ActionTitle>
-                </Action>
+          <Content>
+            <TitleContainer>
+              <Icon name="event" size={24} color={colors.primary} />
+              <Title>Situação da entrega</Title>
+            </TitleContainer>
+            <InfoContainer>
+              <Label>STATUS</Label>
+              <Info style={{ textTransform: 'capitalize' }}>{data.status}</Info>
+            </InfoContainer>
 
-                <Action
-                  onPress={() =>
-                    navigation.navigate('ConfirmDelivery', { data })
-                  }
-                >
-                  <Icon name="check-circle" size={24} color={colors.primary} />
-                  <ActionTitle>Confirmar{`\n`}Entrega</ActionTitle>
+            <InfoContainer
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <View>
+                <Label>DATA DE RETIRADA</Label>
+                <Info>
+                  {data.startDateFormatted
+                    ? data.startDateFormatted
+                    : '- - / - - / - -'}
+                </Info>
+              </View>
+              <View>
+                <Label>DATA DE ENTREGA</Label>
+                <Info>
+                  {data.endDateFormatted
+                    ? data.endDateFormatted
+                    : '- - / - - / - -'}
+                </Info>
+              </View>
+            </InfoContainer>
+          </Content>
+
+          {!data.endDateFormatted && (
+            <ActionList>
+              {!data.startDateFormatted ? (
+                <Action onPress={handleWithdraw}>
+                  <Icon name="trending-flat" size={24} color={colors.primary} />
+                  <ActionTitle>Retirar{`\n`}Entrega</ActionTitle>
                 </Action>
-              </>
-            )}
-          </ActionList>
-        )}
+              ) : (
+                <>
+                  <Action
+                    onPress={() =>
+                      navigation.navigate('CreateProblem', { id: data.id })
+                    }
+                  >
+                    <Icon name="highlight-off" size={24} color={colors.red} />
+                    <ActionTitle>Informar{`\n`}Problema</ActionTitle>
+                  </Action>
+
+                  <Action
+                    onPress={() =>
+                      navigation.navigate('ViewProblems', { data })
+                    }
+                  >
+                    <Icon name="info-outline" size={24} color={colors.yellow} />
+                    <ActionTitle>Visualizar{`\n`}Problemas</ActionTitle>
+                  </Action>
+
+                  <Action
+                    onPress={() =>
+                      navigation.navigate('ConfirmDelivery', { data })
+                    }
+                  >
+                    <Icon
+                      name="check-circle"
+                      size={24}
+                      color={colors.primary}
+                    />
+                    <ActionTitle>Confirmar{`\n`}Entrega</ActionTitle>
+                  </Action>
+                </>
+              )}
+            </ActionList>
+          )}
+        </Detail>
       </Container>
     </>
   );

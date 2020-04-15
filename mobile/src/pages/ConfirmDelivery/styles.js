@@ -17,7 +17,7 @@ export const Content = styled.View`
 
 export const CameraWrapper = styled.View`
   width: 100%;
-  height: 90%;
+  height: 85%;
   overflow: hidden;
   border-radius: 4px;
   margin-bottom: 10px;
