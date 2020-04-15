@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Form } from '@unform/mobile';
 
 import api from '~/services/api';
@@ -9,17 +9,16 @@ import { Container, TextAreaInput, SubmitButton } from './styles';
 
 export default function CreateProblem({ route, navigation }) {
   const formRef = useRef();
+  const [description, setDescription] = useState('');
 
   const { id } = route.params;
 
-  async function handleSubmit(data, { reset }) {
+  async function handleSubmit() {
     await api.post(`/deliveries/${id}/problems`, {
-      description: 'Destinatário ausente',
+      description,
     });
 
     navigation.navigate('Deliveries');
-
-    reset();
   }
 
   return (
@@ -29,6 +28,8 @@ export default function CreateProblem({ route, navigation }) {
         <Form ref={formRef} onSubmit={handleSubmit}>
           <TextAreaInput
             name="description"
+            value={description}
+            onChangeText={setDescription}
             placeholder="Inclua aqui o problema que ocorreu na entrega."
           />
         </Form>

@@ -1,6 +1,8 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import api from '~/services/api';
 
 import colors from '~/styles/colors';
 
@@ -21,6 +23,21 @@ import {
 
 export default function DeliveryDetails({ route, navigation }) {
   const { data } = route.params;
+
+  async function handleWithdraw() {
+    try {
+      await api.put(
+        `/deliverymen/${data.deliveryman.id}/deliveries/${data.id}`,
+        {
+          start_date: new Date(new Date().setHours(12)),
+        },
+      );
+
+      navigation.navigate('Deliveries');
+    } catch (error) {
+      Alert.alert('Falha na Retirada', error.response.data.error);
+    }
+  }
 
   return (
     <>
@@ -54,7 +71,7 @@ export default function DeliveryDetails({ route, navigation }) {
           </TitleContainer>
           <InfoContainer>
             <Label>STATUS</Label>
-            <Info>Pendente</Info>
+            <Info style={{ textTransform: 'capitalize' }}>{data.status}</Info>
           </InfoContainer>
 
           <InfoContainer
@@ -62,37 +79,60 @@ export default function DeliveryDetails({ route, navigation }) {
           >
             <View>
               <Label>DATA DE RETIRADA</Label>
-              <Info>14 / 01 / 2020</Info>
+              <Info>
+                {data.startDateFormatted
+                  ? data.startDateFormatted
+                  : '- - / - - / - -'}
+              </Info>
             </View>
             <View>
               <Label>DATA DE ENTREGA</Label>
-              <Info>- - / - - / - - </Info>
+              <Info>
+                {data.endDateFormatted
+                  ? data.endDateFormatted
+                  : '- - / - - / - -'}
+              </Info>
             </View>
           </InfoContainer>
         </Content>
 
-        <ActionList>
-          <Action
-            onPress={() =>
-              navigation.navigate('CreateProblem', { id: data.id })
-            }
-          >
-            <Icon name="highlight-off" size={24} color={colors.red} />
-            <ActionTitle>Informar{`\n`}Problema</ActionTitle>
-          </Action>
+        {!data.endDateFormatted && (
+          <ActionList>
+            {!data.startDateFormatted ? (
+              <Action onPress={handleWithdraw}>
+                <Icon name="trending-flat" size={24} color={colors.primary} />
+                <ActionTitle>Retirar{`\n`}Entrega</ActionTitle>
+              </Action>
+            ) : (
+              <>
+                <Action
+                  onPress={() =>
+                    navigation.navigate('CreateProblem', { id: data.id })
+                  }
+                >
+                  <Icon name="highlight-off" size={24} color={colors.red} />
+                  <ActionTitle>Informar{`\n`}Problema</ActionTitle>
+                </Action>
 
-          <Action onPress={() => navigation.navigate('ViewProblems', { data })}>
-            <Icon name="info-outline" size={24} color={colors.yellow} />
-            <ActionTitle>Visualizar{`\n`}Problemas</ActionTitle>
-          </Action>
+                <Action
+                  onPress={() => navigation.navigate('ViewProblems', { data })}
+                >
+                  <Icon name="info-outline" size={24} color={colors.yellow} />
+                  <ActionTitle>Visualizar{`\n`}Problemas</ActionTitle>
+                </Action>
 
-          <Action
-            onPress={() => navigation.navigate('ConfirmDelivery', { data })}
-          >
-            <Icon name="check-circle" size={24} color={colors.primary} />
-            <ActionTitle>Confirmar{`\n`}Entrega</ActionTitle>
-          </Action>
-        </ActionList>
+                <Action
+                  onPress={() =>
+                    navigation.navigate('ConfirmDelivery', { data })
+                  }
+                >
+                  <Icon name="check-circle" size={24} color={colors.primary} />
+                  <ActionTitle>Confirmar{`\n`}Entrega</ActionTitle>
+                </Action>
+              </>
+            )}
+          </ActionList>
+        )}
       </Container>
     </>
   );

@@ -17,7 +17,6 @@ import {
 } from './styles';
 
 export default function Delivery({ data, navigation }) {
-  console.tron.log(data);
   return (
     <Container>
       <Content>
@@ -32,7 +31,13 @@ export default function Delivery({ data, navigation }) {
       <Footer>
         <InfoContainer>
           <Label>Data</Label>
-          <Info>15/01/2020</Info>
+          <Info>
+            {!data.startDateFormatted && !data.endDateFormatted
+              ? '- - / - - / - - '
+              : data.endDateFormatted
+              ? data.endDateFormatted
+              : data.startDateFormatted}
+          </Info>
         </InfoContainer>
 
         <InfoContainer>
