@@ -19,23 +19,11 @@ class DeliverymanDeliveryController {
       return res.status(400).json({ error: "deliveryman doesn't exists" });
     }
 
-    const subquery =
-      delivered === 'true'
-        ? {
-            canceled_at: { [Op.eq]: null },
-            end_date: { [Op.ne]: null },
-          }
-        : {
-            [Op.or]: {
-              canceled_at: { [Op.ne]: null },
-              end_date: { [Op.eq]: null },
-            },
-          };
-
-    const deliveries = await Delivery.findAll({
+    const deliveries = await Delivery.findAndCountAll({
       where: {
         deliveryman_id: id,
-        ...subquery,
+        canceled_at: null,
+        end_date: delivered === 'true' ? { [Op.ne]: null } : { [Op.eq]: null },
       },
       attributes: [
         'id',
@@ -90,16 +78,12 @@ class DeliverymanDeliveryController {
     const schema = Yup.object().shape({
       start_date: Yup.date(),
       end_date: Yup.date(),
-      // start_date: Yup.date().when('end_date', (endDate, field) =>
-      //   endDate ? field : field.required()
-      // ),
-      // end_date: Yup.date().when('start_date', (startDate, field) => {
-      //   startDate ? field : field.required();
-      // }),
       signature_id: Yup.number().when('end_date', (endDate, field) =>
         endDate ? field.required() : field
       ),
     });
+
+    console.log(req.body);
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'validation fails' });
@@ -119,18 +103,6 @@ class DeliverymanDeliveryController {
       return res.status(400).json({ error: "delivery doesn't exists" });
     }
 
-    if (delivery.start_date) {
-      return res
-        .status(400)
-        .json({ error: 'delivery has already been withdraw' });
-    }
-
-    if (delivery.end_date || delivery.canceled_at) {
-      return res
-        .status(400)
-        .json({ error: 'delivery has already been closed' });
-    }
-
     const {
       start_date: startDate,
       end_date: endDate,
@@ -138,6 +110,12 @@ class DeliverymanDeliveryController {
     } = req.body;
 
     if (startDate) {
+      if (delivery.start_date) {
+        return res
+          .status(400)
+          .json({ error: 'delivery has already been withdraw' });
+      }
+
       const parsedStartDate = parseISO(startDate);
 
       const hour = getHours(parsedStartDate);
@@ -170,6 +148,12 @@ class DeliverymanDeliveryController {
       await delivery.update({ start_date: parsedStartDate });
 
       return res.json(delivery);
+    }
+
+    if (delivery.end_date || delivery.canceled_at) {
+      return res
+        .status(400)
+        .json({ error: 'delivery has already been closed' });
     }
 
     const parsedEndDate = parseISO(endDate);
